@@ -11,7 +11,7 @@ namespace Calles_SantaMonica.Components.Services
         public Nodo_Multiple? Interserccion_Inicial;
         public Nodo_Multiple? Interserccion_Actual;
 
-        string conexionString = "Server=localhost;Database=Santa_Monica;User ID=root;Password=12345;";
+        string conexionString = "Server=localhost;Database=Santa_Monica;User ID=root;Password=1234;";
 
         public Colonia() {
             Interserccion_Inicial = null;

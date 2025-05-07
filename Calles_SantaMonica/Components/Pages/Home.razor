@@ -70,26 +70,34 @@
             <div class="col-12 mt-2">
                 <div class="row">
                     <div class="col d-flex justify-content-center">
-                        <button type="button" class="btn btn-danger" @onclick="mover_norte_vehiculo" disabled="@disable_norte"><i class="fs-4 bi bi-arrow-up-square"></i></button>
+                        <button type="button" class="btn btn-danger btn_mv" @onclick="mover_norte_vehiculo" disabled="@disable_norte"><i class="fs-4 bi bi-arrow-up-square"></i></button>
                     </div>
                 </div>
                 <div class="row mt-2 mb-2">
                     <div class="col-6 d-flex justify-content-end">
-                        <button type="button" class="btn btn-danger" @onclick="mover_oeste_vehiculo" disabled="@disable_oeste"><i class="fs-4 bi bi-arrow-left-square"></i></button>
+                        <button type="button" class="btn btn-danger btn_mv" @onclick="mover_oeste_vehiculo" disabled="@disable_oeste"><i class="fs-4 bi bi-arrow-left-square"></i></button>
                     </div>
                     <div class="col-6 d-flex justify-content-start">
-                        <button type="button" class="btn btn-danger" @onclick="mover_este_vehiculo" disabled="@disable_este"><i class="fs-4 bi bi-arrow-right-square"></i></button>
+                        <button type="button" class="btn btn-danger btn_mv" @onclick="mover_este_vehiculo" disabled="@disable_este"><i class="fs-4 bi bi-arrow-right-square"></i></button>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col d-flex justify-content-center">
-                        <button type="button" class="btn btn-danger" @onclick="mover_sur_vehiculo" disabled="@disable_sur"><i class="fs-4 bi bi-arrow-down-square"></i></button>
+                        <button type="button" class="btn btn-danger btn_mv" @onclick="mover_sur_vehiculo" disabled="@disable_sur"><i class="fs-4 bi bi-arrow-down-square"></i></button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <div class="col-8">
+    <div class="col-3 d-flex justify-content-center align-items-center">
+        <div class="row">
+            <div class="col-12 justify-content-center d-flex">
+                <img id="semaforo" src="ImagnesSemaforo/Semaforo_verde.png" style="height: 200px">
+            </div>
+            <div id="temporizador" class="col-12 justify-content-center d-flex mt-2" style="font-size: 20px; font-weight: bold; margin-top: 10px;"></div>
+        </div>
+    </div>
+    <div class="col-5">
         <div class="card">
             <div class="card-header">
                 Mapa
@@ -118,6 +126,7 @@
         string? calle = interseccion.set_Interseccion().calle;
         inter = $"{avenida} - {calle}";
         imagen = "images/"+interseccion.set_Interseccion().imagen;
+
         disable_norte = interseccion.nodo_norte == null;
         disable_sur = interseccion.nodo_sur == null;
         disable_este = interseccion.nodo_este == null;
@@ -130,6 +139,8 @@
             colonia.Interserccion_Actual.set_Interseccion().cola_vehicular.PrimerNodo
         ).Split('|');
         setRuta(colonia.Interserccion_Actual);
+        detenerSemaforo();
+        iniciarSemaforo();
     }
 
     void mover_sur(){
@@ -138,6 +149,8 @@
             colonia.Interserccion_Actual.set_Interseccion().cola_vehicular.PrimerNodo
         ).Split('|');
         setRuta(colonia.Interserccion_Actual);
+        detenerSemaforo();
+        iniciarSemaforo();
     }
 
     void mover_este(){
@@ -146,6 +159,8 @@
             colonia.Interserccion_Actual.set_Interseccion().cola_vehicular.PrimerNodo
         ).Split('|');
         setRuta(colonia.Interserccion_Actual);
+        detenerSemaforo();
+        iniciarSemaforo();
 
     }
 
@@ -155,6 +170,8 @@
             colonia.Interserccion_Actual.set_Interseccion().cola_vehicular.PrimerNodo
         ).Split('|');
         setRuta(colonia.Interserccion_Actual);
+        detenerSemaforo();
+        iniciarSemaforo();
     }
 
     void mover_norte_vehiculo()
@@ -206,6 +223,20 @@
     {
         Nodo_Multiple? interseccion = colonia.Interserccion_Actual;
         setRuta(interseccion);
+    }
+
+    
+    [Inject]
+    private IJSRuntime JS { get; set; } = default!;
+
+    private async Task detenerSemaforo()
+    {
+        await JS.InvokeVoidAsync("detenerSemaforo");
+    }
+
+    private async Task iniciarSemaforo()
+    {
+        await JS.InvokeVoidAsync("iniciarSemaforo");
     }
 
 }

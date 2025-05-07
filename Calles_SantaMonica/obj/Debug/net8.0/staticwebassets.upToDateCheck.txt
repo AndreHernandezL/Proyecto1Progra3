@@ -2115,3 +2115,7 @@ wwwroot\images\interseccion_I.png
 wwwroot\images\interseccion_J.png
 wwwroot\images\interseccion_K.png
 wwwroot\images\interseccion_L.png
+wwwroot\ImagnesSemaforo\Semaforo_amarillo.png
+wwwroot\ImagnesSemaforo\Semaforo_rojo.png
+wwwroot\ImagnesSemaforo\Semaforo_verde.png
+wwwroot\semaforo.js
