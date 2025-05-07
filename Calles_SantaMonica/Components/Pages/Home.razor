@@ -1,0 +1,213 @@
+﻿@using Calles_SantaMonica.Components.Services;
+@rendermode InteractiveServer
+@page "/"
+
+<div class="row">
+    <div class="col-4">
+        <div class="row mb-2">
+            <div class="col-12">
+                <select class="form-select" @bind="tipo_vehiculo">
+                    <option value="Carro" selected>Carro</option>
+                    <option value="Motocicleta">Motocicleta</option>
+                    <option value="Autobus">AutoBus</option>
+                    <option value="Camion">Camion</option>
+                </select>
+            </div>
+            <form class="col-12 row mt-2">
+                <div class="col-6">
+                    <div class="form-floating">
+                        <input type="text" class="form-control" id="matricula" @bind="matricula">
+                        <label for="matricula">Matricula</label>
+                    </div>
+                </div>
+                <div class="col-6 d-flex justify-content-center align-items-center">
+                    <button type="button" class="btn btn-success" @onclick="agregar_vehiculo">Ingresar Vehiculo</button>
+                </div>
+            </form>
+        </div>
+        <div class="row">
+            <div class="12">
+                <div class="alert alert-primary text-center" role="alert">
+                    <h6>Controles de Navegacion</h6>
+                    @(inter)
+                </div>
+            </div>
+            <div class="12">
+                <div class="row">
+                    <div class="col d-flex justify-content-center">
+                        <button type="button" class="btn btn-secondary" @onclick="mover_norte" disabled="@disable_norte"><i class="fs-4 bi bi-arrow-up-square"></i></button>
+                    </div>
+                </div>
+                <div class="row mt-2 mb-2">
+                    <div class="col-6 d-flex justify-content-end">
+                        <button type="button" class="btn btn-secondary" @onclick="mover_oeste" disabled="@disable_oeste"><i class="fs-4 bi bi-arrow-left-square"></i></button>
+                    </div>
+                    <div class="col-6 d-flex justify-content-start">
+                        <button type="button" class="btn btn-secondary" @onclick="mover_este" disabled="@disable_este"><i class="fs-4 bi bi-arrow-right-square"></i></button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col d-flex justify-content-center">
+                        <button type="button" class="btn btn-secondary" @onclick="mover_sur" disabled="@disable_sur"><i class="fs-4 bi bi-arrow-down-square"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-2">
+            <div class="12">
+                <div class="alert alert-danger text-center" role="alert">
+                    <h6>Control Vehicular</h6>
+                </div>
+            </div>
+            <div class="col-12 mt-2">
+                <ul class="list-group">
+                    @for (int i = 0; i < vehiculos.Length-1; i++)
+                    {
+                        <li class="list-group-item"><i class="fs-4 bi bi-car-front-fill"></i>&nbsp;&nbsp;@(vehiculos[i])</li>
+                    }
+                </ul>
+            </div>
+            <div class="col-12 mt-2">
+                <div class="row">
+                    <div class="col d-flex justify-content-center">
+                        <button type="button" class="btn btn-danger" @onclick="mover_norte_vehiculo" disabled="@disable_norte"><i class="fs-4 bi bi-arrow-up-square"></i></button>
+                    </div>
+                </div>
+                <div class="row mt-2 mb-2">
+                    <div class="col-6 d-flex justify-content-end">
+                        <button type="button" class="btn btn-danger" @onclick="mover_oeste_vehiculo" disabled="@disable_oeste"><i class="fs-4 bi bi-arrow-left-square"></i></button>
+                    </div>
+                    <div class="col-6 d-flex justify-content-start">
+                        <button type="button" class="btn btn-danger" @onclick="mover_este_vehiculo" disabled="@disable_este"><i class="fs-4 bi bi-arrow-right-square"></i></button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col d-flex justify-content-center">
+                        <button type="button" class="btn btn-danger" @onclick="mover_sur_vehiculo" disabled="@disable_sur"><i class="fs-4 bi bi-arrow-down-square"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-8">
+        <div class="card">
+            <div class="card-header">
+                Mapa
+            </div>
+            <div class="card-body  d-flex justify-content-center">
+                <img src="@imagen" class="card-img-top" style="height: 600px; width: auto">
+            </div>
+        </div>
+    </div>
+</div>
+
+@code{
+    string inter = "";
+    string imagen = "";
+    string tipo_vehiculo;
+    string matricula = "";
+    string[] vehiculos = new string[0];
+    Colonia colonia = new Colonia();
+    bool disable_norte = false;
+    bool disable_sur = false;
+    bool disable_este = false;
+    bool disable_oeste = false;
+
+    void setRuta(Nodo_Multiple? interseccion){
+        string? avenida = interseccion.set_Interseccion().avenida;
+        string? calle = interseccion.set_Interseccion().calle;
+        inter = $"{avenida} - {calle}";
+        imagen = "images/"+interseccion.set_Interseccion().imagen;
+        disable_norte = interseccion.nodo_norte == null;
+        disable_sur = interseccion.nodo_sur == null;
+        disable_este = interseccion.nodo_este == null;
+        disable_oeste = interseccion.nodo_oeste == null;
+    }
+
+    void mover_norte(){
+        colonia.Interserccion_Actual = colonia.Interserccion_Actual.nodo_norte;
+        vehiculos = colonia.Interserccion_Actual.set_Interseccion().cola_vehicular.RecorrerLista(
+            colonia.Interserccion_Actual.set_Interseccion().cola_vehicular.PrimerNodo
+        ).Split('|');
+        setRuta(colonia.Interserccion_Actual);
+    }
+
+    void mover_sur(){
+        colonia.Interserccion_Actual = colonia.Interserccion_Actual.nodo_sur;;
+        vehiculos = colonia.Interserccion_Actual.set_Interseccion().cola_vehicular.RecorrerLista(
+            colonia.Interserccion_Actual.set_Interseccion().cola_vehicular.PrimerNodo
+        ).Split('|');
+        setRuta(colonia.Interserccion_Actual);
+    }
+
+    void mover_este(){
+        colonia.Interserccion_Actual = colonia.Interserccion_Actual.nodo_este;
+        vehiculos = colonia.Interserccion_Actual.set_Interseccion().cola_vehicular.RecorrerLista(
+            colonia.Interserccion_Actual.set_Interseccion().cola_vehicular.PrimerNodo
+        ).Split('|');
+        setRuta(colonia.Interserccion_Actual);
+
+    }
+
+    void mover_oeste(){
+        colonia.Interserccion_Actual = colonia.Interserccion_Actual.nodo_oeste;
+        vehiculos = colonia.Interserccion_Actual.set_Interseccion().cola_vehicular.RecorrerLista(
+            colonia.Interserccion_Actual.set_Interseccion().cola_vehicular.PrimerNodo
+        ).Split('|');
+        setRuta(colonia.Interserccion_Actual);
+    }
+
+    void mover_norte_vehiculo()
+    {
+        Vehiculo vehiculo_actual = colonia.Interserccion_Actual.set_Interseccion().cola_vehicular.mover_vehiculo();
+        colonia.Interserccion_Actual.nodo_norte.set_Interseccion().cola_vehicular.agregar_vehiculo(vehiculo_actual);
+        vehiculos = colonia.Interserccion_Actual.set_Interseccion().cola_vehicular.RecorrerLista(
+            colonia.Interserccion_Actual.set_Interseccion().cola_vehicular.PrimerNodo
+        ).Split('|');
+    }
+
+    void mover_sur_vehiculo()
+    {
+        Vehiculo vehiculo_actual = colonia.Interserccion_Actual.set_Interseccion().cola_vehicular.mover_vehiculo();
+        colonia.Interserccion_Actual.nodo_sur.set_Interseccion().cola_vehicular.agregar_vehiculo(vehiculo_actual);
+        vehiculos = colonia.Interserccion_Actual.nodo_sur.set_Interseccion().cola_vehicular.RecorrerLista(
+            colonia.Interserccion_Actual.set_Interseccion().cola_vehicular.PrimerNodo
+        ).Split('|');
+    }
+
+    void mover_este_vehiculo()
+    {
+        Vehiculo vehiculo_actual = colonia.Interserccion_Actual.set_Interseccion().cola_vehicular.mover_vehiculo();
+        colonia.Interserccion_Actual.nodo_este.set_Interseccion().cola_vehicular.agregar_vehiculo(vehiculo_actual);
+        vehiculos = colonia.Interserccion_Actual.set_Interseccion().cola_vehicular.RecorrerLista(
+            colonia.Interserccion_Actual.set_Interseccion().cola_vehicular.PrimerNodo
+        ).Split('|');
+    }
+
+    void mover_oeste_vehiculo()
+    {
+        Vehiculo vehiculo_actual = colonia.Interserccion_Actual.set_Interseccion().cola_vehicular.mover_vehiculo();
+        colonia.Interserccion_Actual.nodo_oeste.set_Interseccion().cola_vehicular.agregar_vehiculo(vehiculo_actual);
+        vehiculos = colonia.Interserccion_Actual.set_Interseccion().cola_vehicular.RecorrerLista(
+            colonia.Interserccion_Actual.set_Interseccion().cola_vehicular.PrimerNodo
+        ).Split('|');
+    }
+
+    void agregar_vehiculo(){
+        Vehiculo new_vehiculo = new Vehiculo(matricula, tipo_vehiculo);
+        colonia.Interserccion_Inicial.set_Interseccion().cola_vehicular.agregar_vehiculo(new_vehiculo);
+        vehiculos = colonia.Interserccion_Actual.set_Interseccion().cola_vehicular.RecorrerLista(
+            colonia.Interserccion_Actual.set_Interseccion().cola_vehicular.PrimerNodo
+        ).Split('|');
+        matricula = "";
+    }
+
+    protected override void OnInitialized()
+    {
+        Nodo_Multiple? interseccion = colonia.Interserccion_Actual;
+        setRuta(interseccion);
+    }
+
+}
+
+
