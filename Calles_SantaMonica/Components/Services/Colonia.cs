@@ -11,7 +11,7 @@ namespace Calles_SantaMonica.Components.Services
         public Nodo_Multiple? Interserccion_Inicial;
         public Nodo_Multiple? Interserccion_Actual;
 
-        string conexionString = "Server=localhost;Database=Santa_Monica;User ID=root;Password=1234;";
+        string conexionString = "Server=localhost;Database=Santa_Monica;User ID=root;Password=My$q|P@$$w0rDMu$7@f@R;";
 
         public Colonia() {
             Interserccion_Inicial = null;
@@ -54,8 +54,10 @@ namespace Calles_SantaMonica.Components.Services
                 string? avenida = fila["avenida"].ToString();
                 string? calle = fila["calle"].ToString();
                 string? imagen = fila["imagen"].ToString();
+                int semaforo = int.Parse(fila["semaforo"].ToString());
 
-                Interseccion nueva_interseccion = new Interseccion(id, avenida, calle, imagen);
+
+                Interseccion nueva_interseccion = new Interseccion(id, avenida, calle, imagen, semaforo == 1);
                 Nodo_Multiple nuevo_nodo = new Nodo_Multiple(nueva_interseccion);
 
                 if (Interserccion_Inicial != null)

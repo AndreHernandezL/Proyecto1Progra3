@@ -1,12 +1,13 @@
 ﻿const estados = [
-    { nombre: "verde", duracion: 30000, imagen: "ImagnesSemaforo/Semaforo_verde.png" },
-    { nombre: "amarillo", duracion: 3000, imagen: "ImagnesSemaforo/Semaforo_amarillo.png" },
-    { nombre: "rojo", duracion: 10000, imagen: "ImagnesSemaforo/Semaforo_rojo.png" }
+    { nombre: "verde", duracion: 10000, imagen: "ImagnesSemaforo/Semaforo_verde.png" },
+    { nombre: "amarillo", duracion: 2000, imagen: "ImagnesSemaforo/Semaforo_amarillo.png" },
+    { nombre: "rojo", duracion: 5000, imagen: "ImagnesSemaforo/Semaforo_rojo.png" }
 ];
 
 let estadoActual = 0;
 let temporizadorId = null;
 let contadorIntervalId = null;
+let dotnetRef = null;
 
 function cambiarEstado() {
     const semaforo = document.getElementById("semaforo");
@@ -17,13 +18,15 @@ function cambiarEstado() {
         semaforo.src = estado.imagen;
     }
 
+    estadoActual = (estadoActual + 1) % estados.length;
+
     // Mostrar tiempo restante en segundos
     let segundosRestantes = estado.duracion / 1000;
     if (temporizador) {
         temporizador.textContent = `${segundosRestantes}`;
     }
 
-    clearInterval(contadorIntervalId); // Limpiar contador previo si lo hay
+    clearInterval(contadorIntervalId);
     contadorIntervalId = setInterval(() => {
         segundosRestantes--;
         if (temporizador) {
@@ -34,11 +37,17 @@ function cambiarEstado() {
         }
     }, 1000);
 
-    estadoActual = (estadoActual + 1) % estados.length;
     temporizadorId = setTimeout(cambiarEstado, estado.duracion);
+
+    // Invocar método Blazor si se ha proporcionado dotnetRef
+    if (dotnetRef) {
+        const habilitar = (estado.nombre !== "rojo"); // solo deshabilitar si está en rojo
+        dotnetRef.invokeMethodAsync("ActualizarBotones", habilitar);
+    }
 }
 
-window.iniciarSemaforo = function () {
+window.iniciarSemaforo = function (dotnetHelper) {
+
     if (temporizadorId !== null) {
         clearTimeout(temporizadorId);
         temporizadorId = null;
@@ -48,21 +57,9 @@ window.iniciarSemaforo = function () {
         contadorIntervalId = null;
     }
 
-    estadoActual = Math.floor(Math.random() * estados.length)
+    dotnetRef = dotnetHelper; // Referencia a Blazor
 
-    const botones = Array.from(document.querySelectorAll('.btn_mv'))
-        .filter(boton => !boton.disabled);
-
-    if (estadoActual == 2) {
-        botones.forEach(boton => {
-            boton.disabled = true;
-            console.log(boton)
-        });
-    } else {
-        botones.forEach(boton => {
-            boton.disabled = false;
-        });
-    }
+    estadoActual = Math.floor(Math.random() * estados.length);
     cambiarEstado();
 };
 

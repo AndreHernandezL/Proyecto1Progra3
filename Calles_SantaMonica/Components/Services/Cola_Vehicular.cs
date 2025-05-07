@@ -19,7 +19,7 @@ namespace Calles_SantaMonica.Components.Services
             return PrimerNodo == null ? true : false;
         }
 
-        public void agregar_vehiculo(Vehiculo nuevo_vehiculo)
+        public void agregar_vehiculo(Vehiculo? nuevo_vehiculo)
         {
             if (nuevo_vehiculo != null)
             {

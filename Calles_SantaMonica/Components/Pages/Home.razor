@@ -90,12 +90,15 @@
         </div>
     </div>
     <div class="col-3 d-flex justify-content-center align-items-center">
-        <div class="row">
-            <div class="col-12 justify-content-center d-flex">
-                <img id="semaforo" src="ImagnesSemaforo/Semaforo_verde.png" style="height: 200px">
+        @if (semaforo)
+        {
+            <div class="row">
+                <div class="col-12 justify-content-center d-flex">
+                    <img id="semaforo" src="ImagnesSemaforo/Semaforo_verde.png" style="height: 200px">
+                </div>
+                <div id="temporizador" class="col-12 justify-content-center d-flex mt-2" style="font-size: 20px; font-weight: bold; margin-top: 10px;"></div>
             </div>
-            <div id="temporizador" class="col-12 justify-content-center d-flex mt-2" style="font-size: 20px; font-weight: bold; margin-top: 10px;"></div>
-        </div>
+        }
     </div>
     <div class="col-5">
         <div class="card">
@@ -110,135 +113,168 @@
 </div>
 
 @code{
+    private DotNetObjectReference<Home>? objRef;
     string inter = "";
+    bool semaforo = false;
     string imagen = "";
     string tipo_vehiculo;
     string matricula = "";
     string[] vehiculos = new string[0];
-    Colonia colonia = new Colonia();
-    bool disable_norte = false;
-    bool disable_sur = false;
-    bool disable_este = false;
-    bool disable_oeste = false;
+    static Colonia colonia = new Colonia();
+    static Nodo_Multiple? interseccion_actual;
+    static bool disable_norte = false;
+    static bool disable_sur = false;
+    static bool disable_este = false;
+    static bool disable_oeste = false;
 
-    void setRuta(Nodo_Multiple? interseccion){
-        string? avenida = interseccion.set_Interseccion().avenida;
-        string? calle = interseccion.set_Interseccion().calle;
+    void setRuta(){
+        string? avenida = interseccion_actual.set_Interseccion().avenida;
+        string? calle = interseccion_actual.set_Interseccion().calle;
         inter = $"{avenida} - {calle}";
-        imagen = "images/"+interseccion.set_Interseccion().imagen;
-
-        disable_norte = interseccion.nodo_norte == null;
-        disable_sur = interseccion.nodo_sur == null;
-        disable_este = interseccion.nodo_este == null;
-        disable_oeste = interseccion.nodo_oeste == null;
+        imagen = "images/" + interseccion_actual.set_Interseccion().imagen;
+        semaforo = interseccion_actual.set_Interseccion().semaforo;
+        disable_norte = interseccion_actual.nodo_norte == null;
+        disable_sur = interseccion_actual.nodo_sur == null;
+        disable_este = interseccion_actual.nodo_este == null;
+        disable_oeste = interseccion_actual.nodo_oeste == null;
     }
 
     void mover_norte(){
-        colonia.Interserccion_Actual = colonia.Interserccion_Actual.nodo_norte;
-        vehiculos = colonia.Interserccion_Actual.set_Interseccion().cola_vehicular.RecorrerLista(
-            colonia.Interserccion_Actual.set_Interseccion().cola_vehicular.PrimerNodo
+        interseccion_actual = interseccion_actual.nodo_norte;
+        vehiculos = interseccion_actual.set_Interseccion().cola_vehicular.RecorrerLista(
+            interseccion_actual.set_Interseccion().cola_vehicular.PrimerNodo
         ).Split('|');
-        setRuta(colonia.Interserccion_Actual);
+        setRuta();
         detenerSemaforo();
-        iniciarSemaforo();
+        if (semaforo)
+        {
+            iniciarSemaforo();
+        }
     }
 
     void mover_sur(){
-        colonia.Interserccion_Actual = colonia.Interserccion_Actual.nodo_sur;;
-        vehiculos = colonia.Interserccion_Actual.set_Interseccion().cola_vehicular.RecorrerLista(
-            colonia.Interserccion_Actual.set_Interseccion().cola_vehicular.PrimerNodo
+        interseccion_actual = interseccion_actual.nodo_sur; ;
+        vehiculos = interseccion_actual.set_Interseccion().cola_vehicular.RecorrerLista(
+            interseccion_actual.set_Interseccion().cola_vehicular.PrimerNodo
         ).Split('|');
-        setRuta(colonia.Interserccion_Actual);
+        setRuta();
         detenerSemaforo();
-        iniciarSemaforo();
+        if (semaforo)
+        {
+            iniciarSemaforo();
+        }
     }
 
     void mover_este(){
-        colonia.Interserccion_Actual = colonia.Interserccion_Actual.nodo_este;
-        vehiculos = colonia.Interserccion_Actual.set_Interseccion().cola_vehicular.RecorrerLista(
-            colonia.Interserccion_Actual.set_Interseccion().cola_vehicular.PrimerNodo
+        interseccion_actual = interseccion_actual.nodo_este;
+        vehiculos = interseccion_actual.set_Interseccion().cola_vehicular.RecorrerLista(
+            interseccion_actual.set_Interseccion().cola_vehicular.PrimerNodo
         ).Split('|');
-        setRuta(colonia.Interserccion_Actual);
+        setRuta();
         detenerSemaforo();
-        iniciarSemaforo();
+        if (semaforo)
+        {
+            iniciarSemaforo();
+        };
 
     }
 
     void mover_oeste(){
-        colonia.Interserccion_Actual = colonia.Interserccion_Actual.nodo_oeste;
-        vehiculos = colonia.Interserccion_Actual.set_Interseccion().cola_vehicular.RecorrerLista(
-            colonia.Interserccion_Actual.set_Interseccion().cola_vehicular.PrimerNodo
+        interseccion_actual = interseccion_actual.nodo_oeste;
+        vehiculos = interseccion_actual.set_Interseccion().cola_vehicular.RecorrerLista(
+            interseccion_actual.set_Interseccion().cola_vehicular.PrimerNodo
         ).Split('|');
-        setRuta(colonia.Interserccion_Actual);
+        setRuta();
         detenerSemaforo();
-        iniciarSemaforo();
+        if (semaforo)
+        {
+            iniciarSemaforo();
+        }
     }
 
     void mover_norte_vehiculo()
     {
-        Vehiculo vehiculo_actual = colonia.Interserccion_Actual.set_Interseccion().cola_vehicular.mover_vehiculo();
-        colonia.Interserccion_Actual.nodo_norte.set_Interseccion().cola_vehicular.agregar_vehiculo(vehiculo_actual);
-        vehiculos = colonia.Interserccion_Actual.set_Interseccion().cola_vehicular.RecorrerLista(
-            colonia.Interserccion_Actual.set_Interseccion().cola_vehicular.PrimerNodo
+        Vehiculo vehiculo_actual = interseccion_actual.set_Interseccion().cola_vehicular.mover_vehiculo();
+        interseccion_actual.nodo_norte.set_Interseccion().cola_vehicular.agregar_vehiculo(vehiculo_actual);
+        vehiculos = interseccion_actual.set_Interseccion().cola_vehicular.RecorrerLista(
+            interseccion_actual.set_Interseccion().cola_vehicular.PrimerNodo
         ).Split('|');
     }
 
     void mover_sur_vehiculo()
     {
-        Vehiculo vehiculo_actual = colonia.Interserccion_Actual.set_Interseccion().cola_vehicular.mover_vehiculo();
-        colonia.Interserccion_Actual.nodo_sur.set_Interseccion().cola_vehicular.agregar_vehiculo(vehiculo_actual);
-        vehiculos = colonia.Interserccion_Actual.nodo_sur.set_Interseccion().cola_vehicular.RecorrerLista(
-            colonia.Interserccion_Actual.set_Interseccion().cola_vehicular.PrimerNodo
+        Vehiculo vehiculo_actual = interseccion_actual.set_Interseccion().cola_vehicular.mover_vehiculo();
+        interseccion_actual.set_Interseccion().cola_vehicular.agregar_vehiculo(vehiculo_actual);
+        vehiculos = interseccion_actual.nodo_sur.set_Interseccion().cola_vehicular.RecorrerLista(
+            interseccion_actual.set_Interseccion().cola_vehicular.PrimerNodo
         ).Split('|');
     }
 
     void mover_este_vehiculo()
     {
-        Vehiculo vehiculo_actual = colonia.Interserccion_Actual.set_Interseccion().cola_vehicular.mover_vehiculo();
-        colonia.Interserccion_Actual.nodo_este.set_Interseccion().cola_vehicular.agregar_vehiculo(vehiculo_actual);
-        vehiculos = colonia.Interserccion_Actual.set_Interseccion().cola_vehicular.RecorrerLista(
-            colonia.Interserccion_Actual.set_Interseccion().cola_vehicular.PrimerNodo
+        Vehiculo? vehiculo_actual = interseccion_actual.set_Interseccion().cola_vehicular.mover_vehiculo();
+        interseccion_actual.nodo_este.set_Interseccion().cola_vehicular.agregar_vehiculo(vehiculo_actual);
+        vehiculos = interseccion_actual.set_Interseccion().cola_vehicular.RecorrerLista(
+            interseccion_actual.set_Interseccion().cola_vehicular.PrimerNodo
         ).Split('|');
     }
 
     void mover_oeste_vehiculo()
     {
-        Vehiculo vehiculo_actual = colonia.Interserccion_Actual.set_Interseccion().cola_vehicular.mover_vehiculo();
-        colonia.Interserccion_Actual.nodo_oeste.set_Interseccion().cola_vehicular.agregar_vehiculo(vehiculo_actual);
-        vehiculos = colonia.Interserccion_Actual.set_Interseccion().cola_vehicular.RecorrerLista(
-            colonia.Interserccion_Actual.set_Interseccion().cola_vehicular.PrimerNodo
+        Vehiculo? vehiculo_actual = interseccion_actual.set_Interseccion().cola_vehicular.mover_vehiculo();
+        interseccion_actual.nodo_oeste.set_Interseccion().cola_vehicular.agregar_vehiculo(vehiculo_actual);
+        vehiculos = interseccion_actual.set_Interseccion().cola_vehicular.RecorrerLista(
+            interseccion_actual.set_Interseccion().cola_vehicular.PrimerNodo
         ).Split('|');
     }
 
     void agregar_vehiculo(){
-        Vehiculo new_vehiculo = new Vehiculo(matricula, tipo_vehiculo);
-        colonia.Interserccion_Inicial.set_Interseccion().cola_vehicular.agregar_vehiculo(new_vehiculo);
-        vehiculos = colonia.Interserccion_Actual.set_Interseccion().cola_vehicular.RecorrerLista(
-            colonia.Interserccion_Actual.set_Interseccion().cola_vehicular.PrimerNodo
+        Vehiculo? new_vehiculo = new Vehiculo(matricula, tipo_vehiculo);
+        interseccion_actual.set_Interseccion().cola_vehicular.agregar_vehiculo(new_vehiculo);
+        vehiculos = interseccion_actual.set_Interseccion().cola_vehicular.RecorrerLista(
+            interseccion_actual.set_Interseccion().cola_vehicular.PrimerNodo
         ).Split('|');
         matricula = "";
     }
 
     protected override void OnInitialized()
     {
-        Nodo_Multiple? interseccion = colonia.Interserccion_Actual;
-        setRuta(interseccion);
+        Nodo_Multiple? interseccion = colonia.Interserccion_Inicial;
+        interseccion_actual = interseccion;
+        setRuta();
     }
 
-    
+
     [Inject]
     private IJSRuntime JS { get; set; } = default!;
+
+    private async Task iniciarSemaforo()
+    {
+        objRef ??= DotNetObjectReference.Create(this);
+        await JS.InvokeVoidAsync("iniciarSemaforo", objRef);
+    }
 
     private async Task detenerSemaforo()
     {
         await JS.InvokeVoidAsync("detenerSemaforo");
     }
 
-    private async Task iniciarSemaforo()
+    [JSInvokable("ActualizarBotones")]
+    public Task ActualizarBotones(bool habilitar)
     {
-        await JS.InvokeVoidAsync("iniciarSemaforo");
+        disable_norte = !habilitar || interseccion_actual?.nodo_norte == null;
+        disable_sur = !habilitar || interseccion_actual?.nodo_sur == null;
+        disable_este = !habilitar || interseccion_actual?.nodo_este == null;
+        disable_oeste = !habilitar || interseccion_actual?.nodo_oeste == null;
+
+        StateHasChanged(); // Forzar renderizado
+        return Task.CompletedTask;
     }
 
+    public void Dispose()
+    {
+        objRef?.Dispose();
+    }
 }
 
 
