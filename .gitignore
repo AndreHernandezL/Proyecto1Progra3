@@ -1,1 +1,4 @@
-.vs/
+.vs/*
+Calles_SantaMonica/bin/Debug/*
+Calles_SantaMonica/obj/*
+!Calles_SantaMonica/obj/Calles_SantaMonica.csproj.nuget.g.targets
