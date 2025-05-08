@@ -70,20 +70,20 @@
             <div class="col-12 mt-2">
                 <div class="row">
                     <div class="col d-flex justify-content-center">
-                        <button type="button" class="btn btn-danger btn_mv" @onclick="mover_norte_vehiculo" disabled="@disable_norte"><i class="fs-4 bi bi-arrow-up-square"></i></button>
+                        <button type="button" class="btn btn-danger btn_mv" @onclick="mover_norte_vehiculo" disabled="@disable_norte_vm"><i class="fs-4 bi bi-arrow-up-square"></i></button>
                     </div>
                 </div>
                 <div class="row mt-2 mb-2">
                     <div class="col-6 d-flex justify-content-end">
-                        <button type="button" class="btn btn-danger btn_mv" @onclick="mover_oeste_vehiculo" disabled="@disable_oeste"><i class="fs-4 bi bi-arrow-left-square"></i></button>
+                        <button type="button" class="btn btn-danger btn_mv" @onclick="mover_oeste_vehiculo" disabled="@disable_oeste_vm"><i class="fs-4 bi bi-arrow-left-square"></i></button>
                     </div>
                     <div class="col-6 d-flex justify-content-start">
-                        <button type="button" class="btn btn-danger btn_mv" @onclick="mover_este_vehiculo" disabled="@disable_este"><i class="fs-4 bi bi-arrow-right-square"></i></button>
+                        <button type="button" class="btn btn-danger btn_mv" @onclick="mover_este_vehiculo" disabled="@disable_este_vm"><i class="fs-4 bi bi-arrow-right-square"></i></button>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col d-flex justify-content-center">
-                        <button type="button" class="btn btn-danger btn_mv" @onclick="mover_sur_vehiculo" disabled="@disable_sur"><i class="fs-4 bi bi-arrow-down-square"></i></button>
+                        <button type="button" class="btn btn-danger btn_mv" @onclick="mover_sur_vehiculo" disabled="@disable_sur_vm"><i class="fs-4 bi bi-arrow-down-square"></i></button>
                     </div>
                 </div>
             </div>
@@ -120,12 +120,19 @@
     string tipo_vehiculo;
     string matricula = "";
     string[] vehiculos = new string[0];
-    static Colonia colonia = new Colonia();
-    static Nodo_Multiple? interseccion_actual;
-    static bool disable_norte = false;
-    static bool disable_sur = false;
-    static bool disable_este = false;
-    static bool disable_oeste = false;
+    Colonia colonia = new Colonia();
+    Nodo_Multiple? interseccion_actual;
+
+    bool disable_norte = false;
+    bool disable_sur = false;
+    bool disable_este = false;
+    bool disable_oeste = false;
+
+
+    bool disable_norte_vm = false;
+    bool disable_sur_vm = false;
+    bool disable_este_vm = false;
+    bool disable_oeste_vm = false;
 
     void setRuta(){
         string? avenida = interseccion_actual.set_Interseccion().avenida;
@@ -133,10 +140,22 @@
         inter = $"{avenida} - {calle}";
         imagen = "images/" + interseccion_actual.set_Interseccion().imagen;
         semaforo = interseccion_actual.set_Interseccion().semaforo;
+        //ACTIVAMOS LOS BOTONES DE NAVEGACION
         disable_norte = interseccion_actual.nodo_norte == null;
         disable_sur = interseccion_actual.nodo_sur == null;
         disable_este = interseccion_actual.nodo_este == null;
         disable_oeste = interseccion_actual.nodo_oeste == null;
+
+        //ACTIVAMOS LOS BOTONOS DE CONTROL DE TRAFICO
+        disable_norte_vm = interseccion_actual.nodo_norte == null;
+        disable_sur_vm = interseccion_actual.nodo_sur == null;
+        disable_este_vm = interseccion_actual.nodo_este == null;
+        disable_oeste_vm = interseccion_actual.nodo_oeste == null;
+        detenerSemaforo();
+        if (semaforo)
+        {
+            iniciarSemaforo();
+        }
     }
 
     void mover_norte(){
@@ -145,11 +164,6 @@
             interseccion_actual.set_Interseccion().cola_vehicular.PrimerNodo
         ).Split('|');
         setRuta();
-        detenerSemaforo();
-        if (semaforo)
-        {
-            iniciarSemaforo();
-        }
     }
 
     void mover_sur(){
@@ -158,11 +172,7 @@
             interseccion_actual.set_Interseccion().cola_vehicular.PrimerNodo
         ).Split('|');
         setRuta();
-        detenerSemaforo();
-        if (semaforo)
-        {
-            iniciarSemaforo();
-        }
+        
     }
 
     void mover_este(){
@@ -171,12 +181,6 @@
             interseccion_actual.set_Interseccion().cola_vehicular.PrimerNodo
         ).Split('|');
         setRuta();
-        detenerSemaforo();
-        if (semaforo)
-        {
-            iniciarSemaforo();
-        };
-
     }
 
     void mover_oeste(){
@@ -185,11 +189,6 @@
             interseccion_actual.set_Interseccion().cola_vehicular.PrimerNodo
         ).Split('|');
         setRuta();
-        detenerSemaforo();
-        if (semaforo)
-        {
-            iniciarSemaforo();
-        }
     }
 
     void mover_norte_vehiculo()
@@ -204,7 +203,7 @@
     void mover_sur_vehiculo()
     {
         Vehiculo vehiculo_actual = interseccion_actual.set_Interseccion().cola_vehicular.mover_vehiculo();
-        interseccion_actual.set_Interseccion().cola_vehicular.agregar_vehiculo(vehiculo_actual);
+        interseccion_actual.nodo_sur.set_Interseccion().cola_vehicular.agregar_vehiculo(vehiculo_actual);
         vehiculos = interseccion_actual.nodo_sur.set_Interseccion().cola_vehicular.RecorrerLista(
             interseccion_actual.set_Interseccion().cola_vehicular.PrimerNodo
         ).Split('|');
@@ -262,10 +261,10 @@
     [JSInvokable("ActualizarBotones")]
     public Task ActualizarBotones(bool habilitar)
     {
-        disable_norte = !habilitar || interseccion_actual?.nodo_norte == null;
-        disable_sur = !habilitar || interseccion_actual?.nodo_sur == null;
-        disable_este = !habilitar || interseccion_actual?.nodo_este == null;
-        disable_oeste = !habilitar || interseccion_actual?.nodo_oeste == null;
+        disable_norte_vm = !habilitar || interseccion_actual?.nodo_norte == null;
+        disable_sur_vm = !habilitar || interseccion_actual?.nodo_sur == null;
+        disable_este_vm = !habilitar || interseccion_actual?.nodo_este == null;
+        disable_oeste_vm = !habilitar || interseccion_actual?.nodo_oeste == null;
 
         StateHasChanged(); // Forzar renderizado
         return Task.CompletedTask;
