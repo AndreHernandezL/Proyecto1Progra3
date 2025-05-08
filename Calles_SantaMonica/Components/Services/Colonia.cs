@@ -3,6 +3,7 @@ using System.Data;
 using Microsoft.VisualBasic;
 using MySql.Data.MySqlClient;
 using MySqlX.XDevAPI.Relational;
+
 namespace Calles_SantaMonica.Components.Services
 
 {
@@ -11,7 +12,7 @@ namespace Calles_SantaMonica.Components.Services
         public Nodo_Multiple? Interserccion_Inicial;
         public Nodo_Multiple? Interserccion_Actual;
 
-        string conexionString = "Server=localhost;Database=Santa_Monica;User ID=root;Password=1234;";
+        string conexionString = "Server=localhost;Database=Santa_Monica;User ID=root;Password=1234;"; //MYSQL
 
         public Colonia() {
             Interserccion_Inicial = null;
@@ -58,6 +59,7 @@ namespace Calles_SantaMonica.Components.Services
 
 
                 Interseccion nueva_interseccion = new Interseccion(id, avenida, calle, imagen, semaforo == 1);
+
                 Nodo_Multiple nuevo_nodo = new Nodo_Multiple(nueva_interseccion);
 
                 if (Interserccion_Inicial != null)

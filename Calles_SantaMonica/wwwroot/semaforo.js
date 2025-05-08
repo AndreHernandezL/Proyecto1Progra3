@@ -52,6 +52,7 @@ window.iniciarSemaforo = function (dotnetHelper) {
         clearTimeout(temporizadorId);
         temporizadorId = null;
     }
+
     if (contadorIntervalId !== null) {
         clearInterval(contadorIntervalId);
         contadorIntervalId = null;

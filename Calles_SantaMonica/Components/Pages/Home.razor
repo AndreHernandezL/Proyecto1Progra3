@@ -3,6 +3,7 @@
 @page "/"
 
 <div class="row">
+    <!--ESPACIO PARA LOS CONTROLES DEL MAPA-->
     <div class="col-4">
         <div class="row mb-2">
             <div class="col-12">
@@ -63,7 +64,7 @@
                 <ul class="list-group">
                     @for (int i = 0; i < vehiculos.Length-1; i++)
                     {
-                        <li class="list-group-item"><i class="fs-4 bi bi-car-front-fill"></i>&nbsp;&nbsp;@(vehiculos[i])</li>
+                        <li class="list-group-item @(i == 0 ? "list-group-item-success":"")"><i class="fs-4 bi bi-car-front-fill"></i>&nbsp;&nbsp;@(vehiculos[i])</li>
                     }
                 </ul>
             </div>
@@ -89,6 +90,8 @@
             </div>
         </div>
     </div>
+    <!--***********************************-->
+    <!--SEMAFORO-->
     <div class="col-3 d-flex justify-content-center align-items-center">
         @if (semaforo)
         {
@@ -100,6 +103,8 @@
             </div>
         }
     </div>
+    <!--***********************************-->
+    <!--MAPA-->
     <div class="col-5">
         <div class="card">
             <div class="card-header">
@@ -110,10 +115,12 @@
             </div>
         </div>
     </div>
+    <!--***********************************-->
 </div>
 
 @code{
     private DotNetObjectReference<Home>? objRef;
+
     string inter = "";
     bool semaforo = false;
     string imagen = "";
@@ -135,11 +142,13 @@
     bool disable_oeste_vm = false;
 
     void setRuta(){
+
         string? avenida = interseccion_actual.set_Interseccion().avenida;
         string? calle = interseccion_actual.set_Interseccion().calle;
         inter = $"{avenida} - {calle}";
         imagen = "images/" + interseccion_actual.set_Interseccion().imagen;
         semaforo = interseccion_actual.set_Interseccion().semaforo;
+
         //ACTIVAMOS LOS BOTONES DE NAVEGACION
         disable_norte = interseccion_actual.nodo_norte == null;
         disable_sur = interseccion_actual.nodo_sur == null;
@@ -151,6 +160,7 @@
         disable_sur_vm = interseccion_actual.nodo_sur == null;
         disable_este_vm = interseccion_actual.nodo_este == null;
         disable_oeste_vm = interseccion_actual.nodo_oeste == null;
+        
         detenerSemaforo();
         if (semaforo)
         {
@@ -229,7 +239,9 @@
 
     void agregar_vehiculo(){
         Vehiculo? new_vehiculo = new Vehiculo(matricula, tipo_vehiculo);
+
         interseccion_actual.set_Interseccion().cola_vehicular.agregar_vehiculo(new_vehiculo);
+
         vehiculos = interseccion_actual.set_Interseccion().cola_vehicular.RecorrerLista(
             interseccion_actual.set_Interseccion().cola_vehicular.PrimerNodo
         ).Split('|');
@@ -259,6 +271,7 @@
     }
 
     [JSInvokable("ActualizarBotones")]
+
     public Task ActualizarBotones(bool habilitar)
     {
         disable_norte_vm = !habilitar || interseccion_actual?.nodo_norte == null;

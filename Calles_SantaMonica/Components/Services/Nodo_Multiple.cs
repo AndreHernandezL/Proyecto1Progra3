@@ -1,9 +1,14 @@
-﻿namespace Calles_SantaMonica.Components.Services
+﻿
+
+namespace Calles_SantaMonica.Components.Services
 {
     public class Nodo_Multiple
     {
         Interseccion Interseccion;
+
+
         internal Nodo_Multiple? liga;
+
         public Nodo_Multiple? nodo_norte;
         public Nodo_Multiple? nodo_sur;
         public Nodo_Multiple? nodo_este;
